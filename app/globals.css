@@ -24,3 +24,31 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes loadingBar {
+  0% {
+    transform: translateX(-100%);
+    width: 40%;
+  }
+  50% {
+    transform: translateX(30%);
+    width: 60%;
+  }
+  100% {
+    transform: translateX(100%);
+    width: 40%;
+  }
+}
+
+.animate-loading-bar {
+  animation: loadingBar 1.2s infinite ease-in-out;
+}
+
+@keyframes loadingBar {
+  0% {
+    left: -40%;
+  }
+  100% {
+    left: 100%;
+  }
+}

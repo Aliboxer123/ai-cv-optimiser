@@ -49,8 +49,4 @@ Live application is hosted on Vercel:
 
 Every push to the main branch automatically triggers a redeploy.
 
----
-
-## 🔐 Environment Variables
-
 Make sure to configure the following in your environment:

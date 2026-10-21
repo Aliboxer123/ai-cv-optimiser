@@ -28,9 +28,8 @@ export async function POST(req: Request) {
     const jobSafe = jobDescription.slice(0, 3000);
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-5",
-      max_tokens: 4096,
-      temperature: 0,
+  model: "claude-sonnet-5-5",
+  max_tokens: 4096,
       system: `
 You are a CV optimisation engine.
 
@@ -124,10 +123,12 @@ Analyse the match and optimise the CV truthfully. Return the required JSON objec
       missingKeywords: parsed.missingKeywords,
       atsFeedback: parsed.atsFeedback,
     });
-  } catch {
-    return NextResponse.json(
-      { error: "Failed to generate CV. Please try again." },
-      { status: 500 }
-    );
-  }
+  } catch (error) {
+  console.error("CV generation error:", error);
+
+  return NextResponse.json(
+    { error: "Failed to generate CV. Please try again." },
+    { status: 500 }
+  );
+}
 }

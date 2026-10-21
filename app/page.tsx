@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -22,9 +23,6 @@ export default function Page() {
   const isDisabled =
     loading || cvText.trim().length === 0 || jobDesc.trim().length === 0;
 
-  // -----------------------------
-  // LOADING BAR ANIMATION
-  // -----------------------------
   useEffect(() => {
     if (!loading) {
       setProgress(0);
@@ -41,29 +39,16 @@ export default function Page() {
     return () => clearInterval(interval);
   }, [loading]);
 
-  // -----------------------------
-  // LOADING STATUS ROTATION
-  // -----------------------------
   useEffect(() => {
     if (!loading) return;
 
-    const steps = [
-      "Analysing CV structure...",
-      "Matching job requirements...",
-      "Optimising keywords...",
-      "Rewriting CV for ATS...",
-    ];
-
     const interval = setInterval(() => {
-      setLoadingStep((prev) => (prev + 1) % steps.length);
+      setLoadingStep((prev) => (prev + 1) % 4);
     }, 900);
 
     return () => clearInterval(interval);
   }, [loading]);
 
-  // -----------------------------
-  // SMOOTH SCROLL TO RESULT
-  // -----------------------------
   useEffect(() => {
     if (result && resultRef.current) {
       resultRef.current.scrollIntoView({
@@ -95,6 +80,10 @@ export default function Page() {
 
       const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to generate your CV.");
+      }
+
       setResult(data.result || "");
       setScore(data.score ?? 0);
       setStrengths(data.strengths || "");
@@ -103,18 +92,16 @@ export default function Page() {
       setAtsFeedback(data.atsFeedback || "");
 
       setProgress(100);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      alert("We couldn't generate your CV. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
     <main className="min-h-screen bg-zinc-950 text-white px-6 py-10">
       <div className="max-w-3xl mx-auto space-y-6">
-
-        {/* HEADER */}
         <div className="text-center">
           <h1 className="text-4xl font-black">AI CV Optimiser</h1>
           <p className="text-zinc-400 text-sm mt-1">
@@ -122,7 +109,6 @@ export default function Page() {
           </p>
         </div>
 
-        {/* INPUTS */}
         <textarea
           className="w-full bg-zinc-900 p-4 rounded-xl"
           rows={8}
@@ -139,7 +125,6 @@ export default function Page() {
           onChange={(e) => setJobDesc(e.target.value)}
         />
 
-        {/* BUTTON */}
         <button
           onClick={handleGenerate}
           disabled={isDisabled}
@@ -150,7 +135,6 @@ export default function Page() {
           {loading ? "Generating..." : "Generate CV"}
         </button>
 
-        {/* CLEAR BUTTON */}
         <button
           onClick={() => {
             setCvText("");
@@ -168,10 +152,8 @@ export default function Page() {
           Clear
         </button>
 
-        {/* LOADING UI */}
         {loading && (
           <div className="space-y-3 mt-4">
-
             <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-white via-zinc-300 to-white transition-all duration-200"
@@ -190,22 +172,15 @@ export default function Page() {
           </div>
         )}
 
-        {/* OUTPUT */}
         {result && (
           <div ref={resultRef} className="space-y-4">
-
             <div className="bg-zinc-900 p-5 rounded-2xl">
-              <p className="text-xl font-bold">
-                ATS Score: {score}/100
-              </p>
+              <p className="text-xl font-bold">ATS Score: {score}/100</p>
             </div>
 
             <div className="bg-zinc-900 p-5 rounded-2xl">
               <p className="font-bold mb-2">Rewritten CV</p>
-
-              <pre className="whitespace-pre-wrap text-sm">
-                {result}
-              </pre>
+              <pre className="whitespace-pre-wrap text-sm">{result}</pre>
 
               <button
                 onClick={() => {
@@ -233,22 +208,19 @@ export default function Page() {
             </div>
 
             <div className="bg-zinc-900 p-6 rounded-2xl">
-              <p className="font-semibold mb-3">
-                Missing Keywords
-              </p>
+              <p className="font-semibold mb-3">Missing Keywords</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {missingKeywords.map((k, i) => (
+                {missingKeywords.map((keyword, index) => (
                   <div
-                    key={i}
+                    key={index}
                     className="text-center px-3 py-2 rounded-xl bg-zinc-800"
                   >
-                    {k}
+                    {keyword}
                   </div>
                 ))}
               </div>
             </div>
-
           </div>
         )}
       </div>
